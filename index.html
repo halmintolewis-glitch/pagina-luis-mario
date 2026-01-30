@@ -2,29 +2,62 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Página Luis Mario</title>
+  <title>Página de Luis Mario</title>
 
   <style>
     body {
-      background-color: #0f172a;
-      color: white;
+      background-color: white;
       font-family: Arial, sans-serif;
       text-align: center;
-    }
-
-    a {
-      color: #38bdf8;
-      text-decoration: none;
+      padding-top: 60px;
+      color: #222;
     }
 
     h1 {
-      color: #22c55e;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1e40af;
     }
   </style>
 </head>
 
 <body>
-  <h1>Mi página ya no es azul 😎</h1>
-  <p>GitHub Pages funcionando correctamente.</p>
+
+  <h1>Bienvenido 😅</h1>
+  <p>Página de prueba creada por Luis Mario.</p>
+
+  <button onclick="broma()">Presiona aquí</button>
+
+  <script>
+    function broma() {
+      alert(
+        "⚠️ ACCESO DETECTADO ⚠️\n\n" +
+        "¡Caíste! 🤣\n" +
+        "Tus datos están siendo enviados...\n\n" +
+        "😈😈😈\n\n" +
+        "Tranqui 😂 es broma.\n" +
+        "Esta página NO roba datos ni envía notificaciones."
+      );
+    }
+  </script>
+
 </body>
 </html>
