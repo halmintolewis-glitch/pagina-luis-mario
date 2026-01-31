@@ -3,45 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <title>Block Runner Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  background:#111;
-  color:white;
-  font-family:Arial;
-  text-align:center;
-}
+  body {
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+  }
 
-canvas {
-  background:#222;
-  display:block;
-  margin:10px auto;
-  border:2px solid #0a58ca;
-}
+  h1 {
+    margin-top: 10px;
+  }
 
-button {
-  padding:10px 15px;
-  margin:5px;
-  font-weight:bold;
-  cursor:pointer;
-}
+  canvas {
+    background: #222;
+    display: block;
+    margin: 10px auto;
+    border: 2px solid #0a58ca;
+  }
 
-#shop {
-  display:none;
-  background:#333;
-  padding:10px;
-  margin:10px auto;
-  width:300px;
-}
+  button {
+    padding: 12px 18px;
+    margin: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
 
-table {
-  margin:auto;
-  border-collapse:collapse;
-}
-td,th {
-  border:1px solid white;
-  padding:5px 10px;
-}
+  footer {
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.7;
+  }
 </style>
 </head>
 
@@ -49,193 +46,96 @@ td,th {
 
 <h1>🏃 Block Runner Pro</h1>
 
-<div>
-  Nivel: <span id="nivel">1</span> |
-  Monedas: <span id="monedas">0</span> |
-  Skin: <span id="skin">Normal</span>
-</div>
-
 <canvas id="game" width="400" height="200"></canvas>
 
-<button onclick="saltar()">⬆️ Saltar</button>
-<button onclick="reiniciar()">🔄 Reiniciar</button>
-<button onclick="abrirTienda()">🛒 Tienda</button>
+<button ontouchstart="saltar()" onclick="saltar()">⬆️ Saltar</button>
+<button ontouchstart="reiniciar()" onclick="reiniciar()">🔄 Reiniciar</button>
 
-<div id="shop">
-  <h3>🛒 Tienda</h3>
-  <button onclick="comprarSkin('Rojo',100)">Skin Roja (100)</button><br>
-  <button onclick="comprarSkin('Dorado',500)">Skin Dorada (500)</button><br><br>
-  <button onclick="comprarPase()">🏆 Pase Legendario (5000)</button>
-</div>
-
-<h3>🏆 Ranking</h3>
-<table id="ranking">
-  <tr><th>#</th><th>Puntos</th></tr>
-</table>
+<footer>
+  echo por Luis Mario
+</footer>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let jugador, bloques, juego;
-let gravedad = 0.8;
-let velocidad = 3;
-let nivel = 1;
-let monedas = 0;
-let puntos = 0;
-let tiempoBloque = 0;
-let skinActual = "Normal";
-let paseLegendario = false;
+let jugador, obstaculo, puntos, gameOver;
+let ultimoTiempo = 0;
 
-function iniciar() {
-  jugador = { x:40, y:150, w:20, h:20, v:0 };
-  bloques = [];
-  gravedad = 0.8;
-  velocidad = 3;
-  nivel = 1;
-  monedas = 0;
+function iniciarJuego() {
+  jugador = { x: 50, y: 150, w: 20, h: 20, v: 0 };
+  obstaculo = { x: 400, y: 160, w: 20, h: 40 };
   puntos = 0;
-  tiempoBloque = 0;
-
-  document.getElementById("nivel").textContent = nivel;
-  document.getElementById("monedas").textContent = monedas;
-  document.getElementById("skin").textContent = skinActual;
-
-  clearInterval(juego);
-  juego = setInterval(loop, 20);
+  gameOver = false;
+  ultimoTiempo = 0;
+  requestAnimationFrame(gameLoop);
 }
 
-function loop() {
-  ctx.clearRect(0,0,400,200);
+function saltar() {
+  if (jugador.v === 0 && !gameOver) {
+    jugador.v = -16;
+  }
+}
 
-  // Jugador
-  jugador.v += gravedad;
+function reiniciar() {
+  iniciarJuego();
+}
+
+function actualizar() {
+  // gravedad
+  jugador.v += 0.9;
   jugador.y += jugador.v;
 
-  if (jugador.y > 150) {
+  if (jugador.y >= 150) {
     jugador.y = 150;
     jugador.v = 0;
   }
 
-  ctx.fillStyle =
-    skinActual === "Dorado" ? "gold" :
-    skinActual === "Rojo" ? "red" : "white";
+  // obstáculo
+  obstaculo.x -= 6;
+  if (obstaculo.x < -20) {
+    obstaculo.x = 400;
+    puntos++;
+  }
 
+  // colisión
+  if (
+    jugador.x < obstaculo.x + obstaculo.w &&
+    jugador.x + jugador.w > obstaculo.x &&
+    jugador.y < obstaculo.y + obstaculo.h &&
+    jugador.y + jugador.h > obstaculo.y
+  ) {
+    gameOver = true;
+    alert("💀 Perdiste | Puntos: " + puntos);
+  }
+}
+
+function dibujar() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // jugador
+  ctx.fillStyle = "white";
   ctx.fillRect(jugador.x, jugador.y, jugador.w, jugador.h);
 
-  // Bloques
-  tiempoBloque++;
+  // obstáculo
+  ctx.fillStyle = "cyan";
+  ctx.fillRect(obstaculo.x, obstaculo.y, obstaculo.w, obstaculo.h);
 
-  let espacio = 90 - nivel * 5;
-  if (espacio < 40) espacio = 40;
+  // puntos
+  ctx.fillStyle = "white";
+  ctx.font = "14px Arial";
+  ctx.fillText("Puntos: " + puntos, 10, 20);
+}
 
-  if (tiempoBloque > espacio) {
-    let altura = Math.random() * 60 + 30;
-    let ancho = Math.random() * 25 + 20;
-
-    bloques.push({
-      x: 400,
-      y: 200 - altura,
-      w: ancho,
-      h: altura
-    });
-
-    tiempoBloque = 0;
-  }
-
-  bloques.forEach(b => {
-    b.x -= velocidad;
-    ctx.fillStyle = "cyan";
-    ctx.fillRect(b.x, b.y, b.w, b.h);
-
-    // Colisión
-    if (
-      jugador.x < b.x + b.w &&
-      jugador.x + jugador.w > b.x &&
-      jugador.y < b.y + b.h &&
-      jugador.y + jugador.h > b.y
-    ) {
-      perder();
-    }
-  });
-
-  bloques = bloques.filter(b => b.x + b.w > 0);
-
-  // Progresión
-  puntos++;
-
-  if (puntos % 200 === 0) {
-    nivel++;
-    monedas += 20;
-    velocidad += 0.3;
-
-    document.getElementById("nivel").textContent = nivel;
-    document.getElementById("monedas").textContent = monedas;
+function gameLoop(tiempo) {
+  if (!gameOver) {
+    actualizar();
+    dibujar();
+    requestAnimationFrame(gameLoop);
   }
 }
 
-function saltar() {
-  if (jugador.y >= 150) {
-    jugador.v = -16; // impulso fuerte
-  }
-}
-
-function perder() {
-  clearInterval(juego);
-  guardarRanking();
-  alert("💀 Perdiste | Nivel: " + nivel);
-}
-
-function reiniciar() {
-  iniciar();
-}
-
-function abrirTienda() {
-  document.getElementById("shop").style.display =
-    document.getElementById("shop").style.display === "block"
-    ? "none" : "block";
-}
-
-function comprarSkin(nombre, costo) {
-  if (monedas >= costo) {
-    monedas -= costo;
-    skinActual = nombre;
-    document.getElementById("skin").textContent = nombre;
-    document.getElementById("monedas").textContent = monedas;
-  } else {
-    alert("❌ No tienes monedas");
-  }
-}
-
-function comprarPase() {
-  if (monedas >= 5000) {
-    paseLegendario = true;
-    alert("🏆 Eres el NÚMERO UNO DEL JUEGO");
-  } else {
-    alert("Necesitas 5000 monedas");
-  }
-}
-
-function guardarRanking() {
-  let r = JSON.parse(localStorage.getItem("ranking") || "[]");
-  r.push(puntos);
-  r.sort((a,b)=>b-a);
-  r = r.slice(0,5);
-  localStorage.setItem("ranking", JSON.stringify(r));
-  mostrarRanking();
-}
-
-function mostrarRanking() {
-  let r = JSON.parse(localStorage.getItem("ranking") || "[]");
-  let tabla = document.getElementById("ranking");
-  tabla.innerHTML = "<tr><th>#</th><th>Puntos</th></tr>";
-  r.forEach((p,i)=>{
-    tabla.innerHTML += `<tr><td>${i+1}</td><td>${p}</td></tr>`;
-  });
-}
-
-mostrarRanking();
-iniciar();
+iniciarJuego();
 </script>
 
 </body>
