@@ -1,80 +1,242 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Página Luis Mario</title>
+<meta charset="UTF-8">
+<title>Block Runner Pro</title>
 
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
+<style>
+body {
+  background:#111;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
 
-      background-image: url("./IMG-20260130-WA0012.jpg?v=999");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+canvas {
+  background:#222;
+  display:block;
+  margin:10px auto;
+  border:2px solid #0a58ca;
+}
 
-      background-color: rgba(0,0,0,0.55);
-      background-blend-mode: darken;
+button {
+  padding:10px 15px;
+  margin:5px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-      font-family: Georgia, serif;
-      color: #f8fafc;
-    }
+#shop {
+  display:none;
+  background:#333;
+  padding:10px;
+  margin:10px auto;
+  width:300px;
+}
 
-    .contenedor {
-      max-width: 900px;
-      margin: auto;
-      padding: 40px 20px;
-      line-height: 1.8;
-    }
-
-    h1 {
-      text-align: center;
-      color: #22c55e;
-      margin-bottom: 30px;
-    }
-
-    p {
-      margin-bottom: 18px;
-      font-size: 1.05rem;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-  </style>
+table {
+  margin:auto;
+  border-collapse:collapse;
+}
+td,th {
+  border:1px solid white;
+  padding:5px 10px;
+}
+</style>
 </head>
 
 <body>
-  <div class="contenedor">
-    <h1>El sendero donde los animales aprendieron a escucharse</h1>
 
-    <p>En lo profundo de una sabana tranquila, donde el viento movía la hierba como si fuera agua, vivían animales que no competían entre sí, sino que observaban el mundo con paciencia.</p>
+<h1>🏃 Block Runner Pro</h1>
 
-    <p>El elefante mayor era quien primero despertaba cada mañana. No porque fuera el más fuerte, sino porque entendía el valor del tiempo y del silencio antes del ruido.</p>
+<div>
+  Nivel: <span id="nivel">1</span> |
+  Monedas: <span id="monedas">0</span> |
+  Skin: <span id="skin">Normal</span>
+</div>
 
-    <p>Cerca del río, una tortuga caminaba lento, pero nunca se detenía. Su andar constante le había enseñado que avanzar poco también es avanzar.</p>
+<canvas id="game" width="400" height="200"></canvas>
 
-    <p>Las aves, desde lo alto, discutían a veces entre ellas, pero siempre regresaban al mismo árbol, recordando que ningún desacuerdo es más grande que un hogar compartido.</p>
+<button onclick="saltar()">⬆️ Saltar</button>
+<button onclick="reiniciar()">🔄 Reiniciar</button>
+<button onclick="abrirTienda()">🛒 Tienda</button>
 
-    <p>Un día, el cielo cambió de color y la sabana quedó en calma absoluta. Los animales sintieron que algo distinto estaba ocurriendo.</p>
+<div id="shop">
+  <h3>🛒 Tienda</h3>
+  <button onclick="comprarSkin('Rojo',100)">Skin Roja (100)</button><br>
+  <button onclick="comprarSkin('Dorado',500)">Skin Dorada (500)</button><br><br>
+  <button onclick="comprarPase()">🏆 Pase Legendario (5000)</button>
+</div>
 
-    <p>El león joven quiso rugir para imponer orden, pero el elefante levantó la trompa y le enseñó que escuchar primero evita conflictos después.</p>
+<h3>🏆 Ranking</h3>
+<table id="ranking">
+  <tr><th>#</th><th>Puntos</th></tr>
+</table>
 
-    <p>El mono, inquieto como siempre, propuso observar antes de actuar, algo que rara vez hacía, pero que ese día cambió todo.</p>
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-    <p>Mientras tanto, el rinoceronte miraba el horizonte entendiendo que no todo peligro viene corriendo, algunos llegan despacio.</p>
+let jugador, bloques, juego;
+let gravedad = 0.8;
+let velocidad = 3;
+let nivel = 1;
+let monedas = 0;
+let puntos = 0;
+let tiempoBloque = 0;
+let skinActual = "Normal";
+let paseLegendario = false;
 
-    <p>Al caer la tarde, comprendieron que la verdadera fuerza no estaba en los colmillos ni en las garras, sino en la cooperación.</p>
+function iniciar() {
+  jugador = { x:40, y:150, w:20, h:20, v:0 };
+  bloques = [];
+  gravedad = 0.8;
+  velocidad = 3;
+  nivel = 1;
+  monedas = 0;
+  puntos = 0;
+  tiempoBloque = 0;
 
-    <p>Desde entonces, la sabana siguió siendo la misma, pero los animales ya no lo eran. Habían aprendido a convivir sin imponerse.</p>
+  document.getElementById("nivel").textContent = nivel;
+  document.getElementById("monedas").textContent = monedas;
+  document.getElementById("skin").textContent = skinActual;
 
-    <footer>
-      © Luis Mario — Cuento original
-    </footer>
-  </div>
+  clearInterval(juego);
+  juego = setInterval(loop, 20);
+}
+
+function loop() {
+  ctx.clearRect(0,0,400,200);
+
+  // Jugador
+  jugador.v += gravedad;
+  jugador.y += jugador.v;
+
+  if (jugador.y > 150) {
+    jugador.y = 150;
+    jugador.v = 0;
+  }
+
+  ctx.fillStyle =
+    skinActual === "Dorado" ? "gold" :
+    skinActual === "Rojo" ? "red" : "white";
+
+  ctx.fillRect(jugador.x, jugador.y, jugador.w, jugador.h);
+
+  // Bloques
+  tiempoBloque++;
+
+  let espacio = 90 - nivel * 5;
+  if (espacio < 40) espacio = 40;
+
+  if (tiempoBloque > espacio) {
+    let altura = Math.random() * 60 + 30;
+    let ancho = Math.random() * 25 + 20;
+
+    bloques.push({
+      x: 400,
+      y: 200 - altura,
+      w: ancho,
+      h: altura
+    });
+
+    tiempoBloque = 0;
+  }
+
+  bloques.forEach(b => {
+    b.x -= velocidad;
+    ctx.fillStyle = "cyan";
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+
+    // Colisión
+    if (
+      jugador.x < b.x + b.w &&
+      jugador.x + jugador.w > b.x &&
+      jugador.y < b.y + b.h &&
+      jugador.y + jugador.h > b.y
+    ) {
+      perder();
+    }
+  });
+
+  bloques = bloques.filter(b => b.x + b.w > 0);
+
+  // Progresión
+  puntos++;
+
+  if (puntos % 200 === 0) {
+    nivel++;
+    monedas += 20;
+    velocidad += 0.3;
+
+    document.getElementById("nivel").textContent = nivel;
+    document.getElementById("monedas").textContent = monedas;
+  }
+}
+
+function saltar() {
+  if (jugador.y >= 150) {
+    jugador.v = -16; // impulso fuerte
+  }
+}
+
+function perder() {
+  clearInterval(juego);
+  guardarRanking();
+  alert("💀 Perdiste | Nivel: " + nivel);
+}
+
+function reiniciar() {
+  iniciar();
+}
+
+function abrirTienda() {
+  document.getElementById("shop").style.display =
+    document.getElementById("shop").style.display === "block"
+    ? "none" : "block";
+}
+
+function comprarSkin(nombre, costo) {
+  if (monedas >= costo) {
+    monedas -= costo;
+    skinActual = nombre;
+    document.getElementById("skin").textContent = nombre;
+    document.getElementById("monedas").textContent = monedas;
+  } else {
+    alert("❌ No tienes monedas");
+  }
+}
+
+function comprarPase() {
+  if (monedas >= 5000) {
+    paseLegendario = true;
+    alert("🏆 Eres el NÚMERO UNO DEL JUEGO");
+  } else {
+    alert("Necesitas 5000 monedas");
+  }
+}
+
+function guardarRanking() {
+  let r = JSON.parse(localStorage.getItem("ranking") || "[]");
+  r.push(puntos);
+  r.sort((a,b)=>b-a);
+  r = r.slice(0,5);
+  localStorage.setItem("ranking", JSON.stringify(r));
+  mostrarRanking();
+}
+
+function mostrarRanking() {
+  let r = JSON.parse(localStorage.getItem("ranking") || "[]");
+  let tabla = document.getElementById("ranking");
+  tabla.innerHTML = "<tr><th>#</th><th>Puntos</th></tr>";
+  r.forEach((p,i)=>{
+    tabla.innerHTML += `<tr><td>${i+1}</td><td>${p}</td></tr>`;
+  });
+}
+
+mostrarRanking();
+iniciar();
+</script>
+
 </body>
 </html>
