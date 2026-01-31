@@ -2,103 +2,123 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Block Runner Pro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Block Runner Pro</title>
 
 <style>
-  body {
-    background: #111;
-    color: white;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-  }
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
 
-  h1 {
-    margin-top: 10px;
-  }
+h1 {
+  font-size: 42px;
+  margin: 10px 0;
+}
 
-  canvas {
-    background: #222;
-    display: block;
-    margin: 10px auto;
-    border: 2px solid #0a58ca;
-  }
+#info {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
 
-  button {
-    padding: 12px 18px;
-    margin: 6px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+canvas {
+  background: #222;
+  display: block;
+  margin: auto;
+  border: 3px solid #0af;
+}
 
-  footer {
-    margin-top: 10px;
-    font-size: 14px;
-    opacity: 0.7;
-  }
+button {
+  padding: 10px 18px;
+  margin: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#shop {
+  display: none;
+  background: #333;
+  padding: 10px;
+  width: 300px;
+  margin: 10px auto;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🏃 Block Runner Pro</h1>
+<h1>🔥 Luis Mario 🔥</h1>
 
-<canvas id="game" width="400" height="200"></canvas>
+<div id="info">
+Nivel: <span id="nivel">1</span> |
+Monedas: <span id="monedas">0</span> |
+Skin: <span id="skin">Normal</span>
+</div>
 
-<button ontouchstart="saltar()" onclick="saltar()">⬆️ Saltar</button>
-<button ontouchstart="reiniciar()" onclick="reiniciar()">🔄 Reiniciar</button>
+<canvas id="game" width="420" height="220"></canvas>
 
-<footer>
-  echo por Luis Mario
-</footer>
+<br>
+<button onclick="saltar()">⬆ Saltar</button>
+<button onclick="toggleShop()">🛒 Tienda</button>
+<button onclick="reiniciar()">🔄 Reiniciar</button>
+
+<div id="shop">
+  <h3>Tienda</h3>
+  <button onclick="comprarSkin('Rojo', 100)">Skin Roja (100)</button><br><br>
+  <button onclick="comprarSkin('Dorado', 500)">Skin Dorada (500)</button><br><br>
+  <button onclick="comprarPase()">🎟 Pase Legendario (5000)</button>
+</div>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let jugador, obstaculo, puntos, gameOver;
-let ultimoTiempo = 0;
+let jugador, obstaculo, monedas = 0;
+let nivel = 1;
+let velocidad = 2.5;
+let gravedad = 0.5;
+let pase = false;
+let skin = "Normal";
+let gameOver = false;
 
-function iniciarJuego() {
-  jugador = { x: 50, y: 150, w: 20, h: 20, v: 0 };
-  obstaculo = { x: 400, y: 160, w: 20, h: 40 };
-  puntos = 0;
+function iniciar() {
+  jugador = { x: 40, y: 160, w: 20, h: 20, vy: 0 };
+  obstaculo = nuevoObstaculo();
   gameOver = false;
-  ultimoTiempo = 0;
-  requestAnimationFrame(gameLoop);
+  loop();
 }
 
-function saltar() {
-  if (jugador.v === 0 && !gameOver) {
-    jugador.v = -16;
-  }
+function nuevoObstaculo() {
+  const tamaños = [20, 30, 40];
+  let size = tamaños[Math.floor(Math.random()*3)];
+  return { x: canvas.width, y: 180 - size, w: size, h: size };
 }
 
-function reiniciar() {
-  iniciarJuego();
-}
+function loop() {
+  if (gameOver) return;
 
-function actualizar() {
-  // gravedad
-  jugador.v += 0.9;
-  jugador.y += jugador.v;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  if (jugador.y >= 150) {
-    jugador.y = 150;
-    jugador.v = 0;
+  // Jugador
+  jugador.vy += gravedad;
+  jugador.y += jugador.vy;
+  if (jugador.y > 160) {
+    jugador.y = 160;
+    jugador.vy = 0;
   }
 
-  // obstáculo
-  obstaculo.x -= 6;
-  if (obstaculo.x < -20) {
-    obstaculo.x = 400;
-    puntos++;
-  }
+  ctx.fillStyle = skin === "Dorado" ? "gold" : skin === "Rojo" ? "red" : "white";
+  ctx.fillRect(jugador.x, jugador.y, jugador.w, jugador.h);
 
-  // colisión
+  // Obstáculo
+  obstaculo.x -= velocidad;
+  ctx.fillStyle = "#0af";
+  ctx.fillRect(obstaculo.x, obstaculo.y, obstaculo.w, obstaculo.h);
+
+  // Colisión
   if (
     jugador.x < obstaculo.x + obstaculo.w &&
     jugador.x + jugador.w > obstaculo.x &&
@@ -106,36 +126,66 @@ function actualizar() {
     jugador.y + jugador.h > obstaculo.y
   ) {
     gameOver = true;
-    alert("💀 Perdiste | Puntos: " + puntos);
+    alert("💀 Game Over");
+    return;
   }
-}
 
-function dibujar() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Pasó obstáculo
+  if (obstaculo.x + obstaculo.w < 0) {
+    obstaculo = nuevoObstaculo();
+    monedas += pase ? 10 : 5;
+    nivel++;
 
-  // jugador
-  ctx.fillStyle = "white";
-  ctx.fillRect(jugador.x, jugador.y, jugador.w, jugador.h);
+    if (nivel <= 1000) velocidad += 0.01;
+    else velocidad += 0.02;
 
-  // obstáculo
-  ctx.fillStyle = "cyan";
-  ctx.fillRect(obstaculo.x, obstaculo.y, obstaculo.w, obstaculo.h);
-
-  // puntos
-  ctx.fillStyle = "white";
-  ctx.font = "14px Arial";
-  ctx.fillText("Puntos: " + puntos, 10, 20);
-}
-
-function gameLoop(tiempo) {
-  if (!gameOver) {
-    actualizar();
-    dibujar();
-    requestAnimationFrame(gameLoop);
+    if (nivel === 1000) {
+      monedas += 5000000;
+      alert("🎉 FELICITACIONES 🎉\nCompletaste 1000 niveles\n+5,000,000 monedas");
+    }
   }
+
+  document.getElementById("nivel").textContent = nivel + " / 7000";
+  document.getElementById("monedas").textContent = monedas;
+  document.getElementById("skin").textContent = skin;
+
+  requestAnimationFrame(loop);
 }
 
-iniciarJuego();
+function saltar() {
+  if (jugador.y >= 160) jugador.vy = -9;
+}
+
+function reiniciar() {
+  nivel = 1;
+  velocidad = 2.5;
+  monedas = 0;
+  pase = false;
+  skin = "Normal";
+  iniciar();
+}
+
+function toggleShop() {
+  const s = document.getElementById("shop");
+  s.style.display = s.style.display === "none" ? "block" : "none";
+}
+
+function comprarSkin(nombre, precio) {
+  if (monedas >= precio) {
+    monedas -= precio;
+    skin = nombre;
+  } else alert("❌ No tienes monedas");
+}
+
+function comprarPase() {
+  if (monedas >= 5000) {
+    monedas -= 5000;
+    pase = true;
+    alert("🎟 Pase Legendario activado");
+  } else alert("❌ Necesitas 5000 monedas");
+}
+
+iniciar();
 </script>
 
 </body>
