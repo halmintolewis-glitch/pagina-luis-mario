@@ -1,76 +1,85 @@
 /* ===== RESET BÁSICO ===== */
-body{
-  margin:0;
+body {
+  margin: 0;
   font-family: Arial, sans-serif;
-  background:#f2f2f2;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  transition:0.3s;
+  background: #f2f2f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  transition: 0.3s;
 }
 
-/* ===== CAJA CENTRAL ===== */
-.box{
-  background:white;
-  padding:30px;
-  border-radius:12px;
-  width:320px;
-  text-align:center;
-  box-shadow:0 5px 20px rgba(0,0,0,0.15);
+/* ===== CAJA PRINCIPAL ===== */
+.box {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 350px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
 }
 
-/* ===== TÍTULOS ===== */
-h1{
-  margin-bottom:15px;
+/* ===== TITULOS ===== */
+h1 {
+  margin-bottom: 15px;
 }
 
-#date{
-  font-size:14px;
-  opacity:.7;
+/* ===== DIV DEL JUEGO ===== */
+.juego {
+  font-size: 24px;
+  margin: 20px 0;
+  padding: 20px;
+  border-radius: 12px;
+  transition: 0.3s;
 }
 
-#clock{
-  font-size:30px;
-  font-weight:bold;
-  margin:10px 0 20px 0;
+/* ===== SKINS ===== */
+.normal {
+  background: #ddd;
+  color: black;
 }
 
-/* ===== FRASE ===== */
-#quote{
-  font-size:16px;
-  margin-bottom:20px;
+.roja {
+  background: #f44336;
+  color: white;
 }
 
-/* ===== TEMPORIZADOR ===== */
-.timer{
-  font-size:42px;
-  font-weight:bold;
-  margin:20px 0;
+.azul {
+  background: #2196f3;
+  color: white;
+}
+
+.dorada {
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  color: black;
+  font-weight: bold;
+  box-shadow: 0 0 15px gold;
 }
 
 /* ===== BOTONES ===== */
-button{
-  padding:10px 14px;
-  margin:5px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  background:#222;
-  color:white;
-  font-size:14px;
+button {
+  padding: 10px 14px;
+  margin: 5px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #222;
+  color: white;
+  font-size: 14px;
+  transition: 0.2s;
 }
 
-button:hover{
-  opacity:.85;
+button:hover {
+  opacity: 0.85;
 }
 
-/* ===== MODO OSCURO ===== */
-.dark{
-  background:#111;
-  color:white;
+/* ===== MODO OSCURO (opcional) ===== */
+.dark {
+  background: #111;
+  color: white;
 }
 
-.dark .box{
-  background:#1e1e1e;
+.dark .box {
+  background: #1e1e1e;
 }
