@@ -1,85 +1,52 @@
-/* ===== RESET BÁSICO ===== */
-body {
-  margin: 0;
+body{
+  margin:0;
   font-family: Arial, sans-serif;
-  background: #f2f2f2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  transition: 0.3s;
+  background:#f0f2f5;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-/* ===== CAJA PRINCIPAL ===== */
-.box {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  width: 350px;
-  text-align: center;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+.game-container{
+  background:white;
+  padding:20px 40px;
+  border-radius:12px;
+  text-align:center;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  width:400px;
 }
 
-/* ===== TITULOS ===== */
-h1 {
-  margin-bottom: 15px;
+.stats p{
+  font-size:18px;
 }
 
-/* ===== DIV DEL JUEGO ===== */
-.juego {
-  font-size: 24px;
-  margin: 20px 0;
-  padding: 20px;
-  border-radius: 12px;
-  transition: 0.3s;
+.game{
+  margin:20px 0;
 }
 
-/* ===== SKINS ===== */
-.normal {
-  background: #ddd;
-  color: black;
+.dinero{
+  font-size:48px;
+  margin-bottom:20px;
 }
 
-.roja {
-  background: #f44336;
-  color: white;
+.tienda{
+  display:flex;
+  flex-direction: column;
+  gap:10px;
 }
 
-.azul {
-  background: #2196f3;
-  color: white;
+.buy-btn{
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:16px;
+  background:#222;
+  color:white;
+  transition:0.2s;
 }
 
-.dorada {
-  background: linear-gradient(45deg, #FFD700, #FFA500);
-  color: black;
-  font-weight: bold;
-  box-shadow: 0 0 15px gold;
-}
-
-/* ===== BOTONES ===== */
-button {
-  padding: 10px 14px;
-  margin: 5px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #222;
-  color: white;
-  font-size: 14px;
-  transition: 0.2s;
-}
-
-button:hover {
-  opacity: 0.85;
-}
-
-/* ===== MODO OSCURO (opcional) ===== */
-.dark {
-  background: #111;
-  color: white;
-}
-
-.dark .box {
-  background: #1e1e1e;
+.buy-btn:hover{
+  opacity:.85;
 }
