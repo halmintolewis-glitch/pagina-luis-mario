@@ -1,94 +1,59 @@
-// ===== VARIABLES DEL JUEGO =====
-let puntos = Number(localStorage.getItem("puntos")) || 0;
+// ===== VARIABLES =====
+let dinero = Number(localStorage.getItem("dinero")) || 0;
 let nivel = Number(localStorage.getItem("nivel")) || 1;
-let skins = JSON.parse(localStorage.getItem("skins")) || ["normal"];
-let skinActiva = localStorage.getItem("skinActiva") || "normal";
-let paseDorado = JSON.parse(localStorage.getItem("paseDorado")) || false;
+let edificios = JSON.parse(localStorage.getItem("edificios")) || {
+  oficina: 0,
+  banco: 0,
+  torre: 0
+};
 
 // ===== ELEMENTOS HTML =====
-const puntosEl = document.getElementById("puntos");   // Muestra puntos
-const nivelEl = document.getElementById("nivel");     // Muestra nivel
-const skinEl = document.getElementById("skin");       // Skin activa
-const juegoEl = document.getElementById("juego");     // Elemento del juego
-const btnGanar = document.getElementById("btnGanar"); // Botón ganar puntos
-const btnTienda = document.getElementById("btnTienda"); // Botón abrir tienda
+const dineroEl = document.getElementById("dinero");
+const nivelEl = document.getElementById("nivel");
 
-// ===== FUNCIONES DE GUARDADO =====
-function guardar() {
-  localStorage.setItem("puntos", puntos);
+// ===== FUNCIONES =====
+function guardar(){
+  localStorage.setItem("dinero", dinero);
   localStorage.setItem("nivel", nivel);
-  localStorage.setItem("skins", JSON.stringify(skins));
-  localStorage.setItem("skinActiva", skinActiva);
-  localStorage.setItem("paseDorado", JSON.stringify(paseDorado));
+  localStorage.setItem("edificios", JSON.stringify(edificios));
 }
 
-// ===== FUNCIONES DE ACTUALIZACIÓN =====
-function actualizarUI() {
-  if (puntosEl) puntosEl.textContent = puntos;
-  if (nivelEl) nivelEl.textContent = nivel;
-  if (skinEl) skinEl.textContent = skinActiva;
-  if (juegoEl) juegoEl.className = "juego " + skinActiva;
+function actualizarUI(){
+  dineroEl.textContent = dinero;
+  nivelEl.textContent = nivel;
 }
 
-// ===== GANAR PUNTOS =====
-function ganarPuntos(cantidad = 100) {
-  puntos += cantidad;
-  nivel = Math.floor(puntos / 1000) + 1; // sube de nivel cada 1000 puntos
+// ===== INGRESOS AUTOMÁTICOS =====
+function ingresosAutomáticos(){
+  let ingreso = edificios.oficina * 10 + edificios.banco * 100 + edificios.torre * 1000;
+  dinero += ingreso;
+  nivel = Math.floor(dinero / 1000) + 1;
   guardar();
   actualizarUI();
 }
 
-// ===== TIENDA =====
-const tiendaSkins = [
-  { nombre: "roja", precio: 500 },
-  { nombre: "azul", precio: 1000 },
-  { nombre: "dorada", precio: 45000, paseDorado: true }
-];
+// Cada segundo se suman ingresos
+setInterval(ingresosAutomáticos, 1000);
 
-function comprarSkin(nombre) {
-  const skin = tiendaSkins.find(s => s.nombre === nombre);
-  if (!skin) return alert("Skin no encontrada");
-  
-  if (skin.paseDorado) {
-    if (paseDorado) return alert("Ya tienes el pase dorado");
-    if (puntos < skin.precio) return alert("No tienes suficiente oro");
-    paseDorado = true;
-  } else {
-    if (skins.includes(nombre)) return alert("Ya tienes esta skin");
-    if (puntos < skin.precio) return alert("No tienes suficiente oro");
-    skins.push(nombre);
-  }
-  
-  puntos -= skin.precio;
-  skinActiva = nombre;
-  guardar();
-  actualizarUI();
-  alert("¡Skin comprada!");
-}
+// ===== COMPRAR EDIFICIOS =====
+const botones = document.querySelectorAll(".buy-btn");
 
-function aplicarSkin(nombre) {
-  if (!skins.includes(nombre)) return alert("No tienes esta skin");
-  skinActiva = nombre;
-  guardar();
-  actualizarUI();
-}
+botones.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const edificio = btn.dataset.edificio;
+    const precio = Number(btn.dataset.precio);
 
-// ===== INICIALIZACIÓN =====
-document.addEventListener("DOMContentLoaded", () => {
-  actualizarUI();
-
-  // Botón ganar puntos
-  if (btnGanar) btnGanar.addEventListener("click", () => ganarPuntos(100));
-
-  // Botón tienda (ejemplo simple)
-  if (btnTienda) btnTienda.addEventListener("click", () => {
-    let opciones = tiendaSkins.map(s => {
-      return s.paseDorado 
-        ? `${s.nombre} - ${s.precio} oro (pase dorado)` 
-        : `${s.nombre} - ${s.precio} oro`;
-    }).join("\n");
-    
-    const comprar = prompt("TIENDA:\n" + opciones + "\nEscribe el nombre de la skin que quieres comprar:");
-    if (comprar) comprarSkin(comprar.trim());
+    if(dinero >= precio){
+      dinero -= precio;
+      edificios[edificio]++;
+      guardar();
+      actualizarUI();
+      alert(`Compraste ${edificio}!`);
+    }else{
+      alert("No tienes suficiente dinero!");
+    }
   });
 });
+
+// Inicializa UI
+actualizarUI();
