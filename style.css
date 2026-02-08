@@ -1,0 +1,76 @@
+/* ===== RESET BÁSICO ===== */
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#f2f2f2;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  transition:0.3s;
+}
+
+/* ===== CAJA CENTRAL ===== */
+.box{
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  width:320px;
+  text-align:center;
+  box-shadow:0 5px 20px rgba(0,0,0,0.15);
+}
+
+/* ===== TÍTULOS ===== */
+h1{
+  margin-bottom:15px;
+}
+
+#date{
+  font-size:14px;
+  opacity:.7;
+}
+
+#clock{
+  font-size:30px;
+  font-weight:bold;
+  margin:10px 0 20px 0;
+}
+
+/* ===== FRASE ===== */
+#quote{
+  font-size:16px;
+  margin-bottom:20px;
+}
+
+/* ===== TEMPORIZADOR ===== */
+.timer{
+  font-size:42px;
+  font-weight:bold;
+  margin:20px 0;
+}
+
+/* ===== BOTONES ===== */
+button{
+  padding:10px 14px;
+  margin:5px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  background:#222;
+  color:white;
+  font-size:14px;
+}
+
+button:hover{
+  opacity:.85;
+}
+
+/* ===== MODO OSCURO ===== */
+.dark{
+  background:#111;
+  color:white;
+}
+
+.dark .box{
+  background:#1e1e1e;
+}
