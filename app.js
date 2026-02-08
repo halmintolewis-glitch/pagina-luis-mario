@@ -7,9 +7,11 @@ let edificios = JSON.parse(localStorage.getItem("edificios")) || {
   torre: 0
 };
 
-// ===== ELEMENTOS HTML =====
+// ===== ELEMENTOS =====
 const dineroEl = document.getElementById("dinero");
 const nivelEl = document.getElementById("nivel");
+const progresoEl = document.getElementById("progreso-nivel");
+const juegoDiv = document.getElementById("juego");
 
 // ===== FUNCIONES =====
 function guardar(){
@@ -21,39 +23,48 @@ function guardar(){
 function actualizarUI(){
   dineroEl.textContent = dinero;
   nivelEl.textContent = nivel;
+  let progreso = (dinero % 1000) / 1000 * 100;
+  progresoEl.style.width = progreso + "%";
+
+  // actualizar edificios visuales
+  juegoDiv.innerHTML = "";
+  for(let tipo in edificios){
+    for(let i=0;i<edificios[tipo];i++){
+      const div = document.createElement("div");
+      div.className = "edificio comprado";
+      if(tipo=="oficina") div.textContent="🏢";
+      if(tipo=="banco") div.textContent="🏦";
+      if(tipo=="torre") div.textContent="🌆";
+      juegoDiv.appendChild(div);
+    }
+  }
 }
 
 // ===== INGRESOS AUTOMÁTICOS =====
-function ingresosAutomáticos(){
-  let ingreso = edificios.oficina * 10 + edificios.banco * 100 + edificios.torre * 1000;
-  dinero += ingreso;
-  nivel = Math.floor(dinero / 1000) + 1;
+function ingresos(){
+  dinero += edificios.oficina*10 + edificios.banco*100 + edificios.torre*1000;
+  nivel = Math.floor(dinero/1000)+1;
   guardar();
   actualizarUI();
 }
-
-// Cada segundo se suman ingresos
-setInterval(ingresosAutomáticos, 1000);
+setInterval(ingresos,1000);
 
 // ===== COMPRAR EDIFICIOS =====
 const botones = document.querySelectorAll(".buy-btn");
-
 botones.forEach(btn=>{
-  btn.addEventListener("click", ()=>{
+  btn.addEventListener("click",()=>{
     const edificio = btn.dataset.edificio;
     const precio = Number(btn.dataset.precio);
-
-    if(dinero >= precio){
-      dinero -= precio;
+    if(dinero>=precio){
+      dinero-=precio;
       edificios[edificio]++;
       guardar();
       actualizarUI();
-      alert(`Compraste ${edificio}!`);
     }else{
       alert("No tienes suficiente dinero!");
     }
   });
 });
 
-// Inicializa UI
+// ===== INICIALIZACIÓN =====
 actualizarUI();
