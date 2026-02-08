@@ -1,7 +1,7 @@
 body{
   margin:0;
   font-family: Arial, sans-serif;
-  background:#f0f2f5;
+  background:#e0f7fa;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -10,24 +10,58 @@ body{
 
 .game-container{
   background:white;
-  padding:20px 40px;
+  padding:30px;
   border-radius:12px;
   text-align:center;
-  box-shadow:0 5px 15px rgba(0,0,0,0.2);
-  width:400px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.2);
+  width:500px;
 }
 
 .stats p{
   font-size:18px;
+  margin:5px 0;
+}
+
+.barra-nivel{
+  background:#ddd;
+  border-radius:12px;
+  height:20px;
+  width:100%;
+  margin-bottom:20px;
+  overflow:hidden;
+}
+
+.progreso{
+  background:#4caf50;
+  height:100%;
+  width:0%;
+  transition: width 0.3s;
 }
 
 .game{
-  margin:20px 0;
+  display:flex;
+  flex-wrap: wrap;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:20px;
+  min-height:150px;
 }
 
-.dinero{
-  font-size:48px;
-  margin-bottom:20px;
+.edificio{
+  width:60px;
+  height:60px;
+  font-size:36px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:6px;
+  background:#ccc;
+  transition: transform 0.2s;
+}
+
+.edificio.comprado{
+  transform: scale(1.2);
+  background:#ffd54f;
 }
 
 .tienda{
