@@ -1,74 +1,94 @@
-// ===== FECHA Y RELOJ =====
-const dateEl = document.getElementById("date");
-const clockEl = document.getElementById("clock");
+// ===== VARIABLES DEL JUEGO =====
+let puntos = Number(localStorage.getItem("puntos")) || 0;
+let nivel = Number(localStorage.getItem("nivel")) || 1;
+let skins = JSON.parse(localStorage.getItem("skins")) || ["normal"];
+let skinActiva = localStorage.getItem("skinActiva") || "normal";
+let paseDorado = JSON.parse(localStorage.getItem("paseDorado")) || false;
 
-function updateDateTime() {
-  const now = new Date();
-  // Fecha en formato día/mes/año
-  dateEl.textContent = now.toLocaleDateString();
-  // Hora en formato HH:MM:SS
-  clockEl.textContent = now.toLocaleTimeString();
+// ===== ELEMENTOS HTML =====
+const puntosEl = document.getElementById("puntos");   // Muestra puntos
+const nivelEl = document.getElementById("nivel");     // Muestra nivel
+const skinEl = document.getElementById("skin");       // Skin activa
+const juegoEl = document.getElementById("juego");     // Elemento del juego
+const btnGanar = document.getElementById("btnGanar"); // Botón ganar puntos
+const btnTienda = document.getElementById("btnTienda"); // Botón abrir tienda
+
+// ===== FUNCIONES DE GUARDADO =====
+function guardar() {
+  localStorage.setItem("puntos", puntos);
+  localStorage.setItem("nivel", nivel);
+  localStorage.setItem("skins", JSON.stringify(skins));
+  localStorage.setItem("skinActiva", skinActiva);
+  localStorage.setItem("paseDorado", JSON.stringify(paseDorado));
 }
-setInterval(updateDateTime, 1000);
-updateDateTime(); // Ejecuta al cargar la página
 
+// ===== FUNCIONES DE ACTUALIZACIÓN =====
+function actualizarUI() {
+  if (puntosEl) puntosEl.textContent = puntos;
+  if (nivelEl) nivelEl.textContent = nivel;
+  if (skinEl) skinEl.textContent = skinActiva;
+  if (juegoEl) juegoEl.className = "juego " + skinActiva;
+}
 
+// ===== GANAR PUNTOS =====
+function ganarPuntos(cantidad = 100) {
+  puntos += cantidad;
+  nivel = Math.floor(puntos / 1000) + 1; // sube de nivel cada 1000 puntos
+  guardar();
+  actualizarUI();
+}
 
-// ===== FRASES ROTATIVAS =====
-const quotes = [
-  "Disciplina primero.",
-  "El éxito requiere esfuerzo.",
-  "Cada día cuenta.",
-  "Concéntrate en tus metas.",
-  "La constancia vence todo."
+// ===== TIENDA =====
+const tiendaSkins = [
+  { nombre: "roja", precio: 500 },
+  { nombre: "azul", precio: 1000 },
+  { nombre: "dorada", precio: 45000, paseDorado: true }
 ];
 
-const quoteEl = document.getElementById("quote");
-let currentQuote = 0;
-
-setInterval(() => {
-  currentQuote = (currentQuote + 1) % quotes.length;
-  quoteEl.textContent = quotes[currentQuote];
-}, 5000); // Cambia cada 5 segundos
-
-
-
-// ===== TEMPORIZADOR DE ENFOQUE =====
-let timerDuration = 25 * 60; // 25 minutos
-let timerInterval;
-const timerEl = document.getElementById("timer");
-const startBtn = document.getElementById("startBtn");
-
-function formatTime(seconds) {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+function comprarSkin(nombre) {
+  const skin = tiendaSkins.find(s => s.nombre === nombre);
+  if (!skin) return alert("Skin no encontrada");
+  
+  if (skin.paseDorado) {
+    if (paseDorado) return alert("Ya tienes el pase dorado");
+    if (puntos < skin.precio) return alert("No tienes suficiente oro");
+    paseDorado = true;
+  } else {
+    if (skins.includes(nombre)) return alert("Ya tienes esta skin");
+    if (puntos < skin.precio) return alert("No tienes suficiente oro");
+    skins.push(nombre);
+  }
+  
+  puntos -= skin.precio;
+  skinActiva = nombre;
+  guardar();
+  actualizarUI();
+  alert("¡Skin comprada!");
 }
 
-function startTimer() {
-  clearInterval(timerInterval); // Para cualquier temporizador previo
-  let timeLeft = timerDuration;
-  timerEl.textContent = formatTime(timeLeft);
-
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    timerEl.textContent = formatTime(timeLeft);
-
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      alert("¡Tiempo de enfoque terminado!");
-      timerEl.textContent = formatTime(timerDuration);
-    }
-  }, 1000);
+function aplicarSkin(nombre) {
+  if (!skins.includes(nombre)) return alert("No tienes esta skin");
+  skinActiva = nombre;
+  guardar();
+  actualizarUI();
 }
 
-startBtn.addEventListener("click", startTimer);
+// ===== INICIALIZACIÓN =====
+document.addEventListener("DOMContentLoaded", () => {
+  actualizarUI();
 
+  // Botón ganar puntos
+  if (btnGanar) btnGanar.addEventListener("click", () => ganarPuntos(100));
 
-
-// ===== MODO OSCURO =====
-const darkBtn = document.getElementById("darkBtn");
-
-darkBtn.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
+  // Botón tienda (ejemplo simple)
+  if (btnTienda) btnTienda.addEventListener("click", () => {
+    let opciones = tiendaSkins.map(s => {
+      return s.paseDorado 
+        ? `${s.nombre} - ${s.precio} oro (pase dorado)` 
+        : `${s.nombre} - ${s.precio} oro`;
+    }).join("\n");
+    
+    const comprar = prompt("TIENDA:\n" + opciones + "\nEscribe el nombre de la skin que quieres comprar:");
+    if (comprar) comprarSkin(comprar.trim());
+  });
 });
