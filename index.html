@@ -2,28 +2,33 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mi Juego</title>
+  <title>Bank Tycoon</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="box">
+<div class="game-container">
 
-  <h1>Mi Juego</h1>
+  <h1>Bank Tycoon</h1>
 
-  <p>Puntos: <span id="puntos">0</span></p>
-  <p>Nivel: <span id="nivel">1</span></p>
-  <p>Skin activa: <span id="skin">normal</span></p>
+  <div class="stats">
+    <p>Dinero: $<span id="dinero">0</span></p>
+    <p>Nivel: <span id="nivel">1</span></p>
+  </div>
 
-  <div id="juego" class="juego normal">🎮 Aquí va tu personaje 🎮</div>
+  <div class="game">
+    <div id="dineroDiv" class="dinero">💰</div>
+  </div>
 
-  <button id="btnGanar">Ganar 100 puntos</button>
-  <button id="btnTienda">Abrir tienda</button>
+  <h2>Tienda</h2>
+  <div class="tienda">
+    <button class="buy-btn" data-edificio="oficina" data-precio="100">🏢 Oficina ($100)</button>
+    <button class="buy-btn" data-edificio="banco" data-precio="1000">🏦 Banco ($1,000)</button>
+    <button class="buy-btn" data-edificio="torre" data-precio="10000">🌆 Torre ($10,000)</button>
+  </div>
 
 </div>
 
 <script src="app.js"></script>
-
 </body>
 </html>
