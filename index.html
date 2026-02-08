@@ -1,192 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Block Runner Pro</title>
-
-<style>
-body {
-  margin: 0;
-  background: #111;
-  color: white;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-
-h1 {
-  font-size: 42px;
-  margin: 10px 0;
-}
-
-#info {
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-
-canvas {
-  background: #222;
-  display: block;
-  margin: auto;
-  border: 3px solid #0af;
-}
-
-button {
-  padding: 10px 18px;
-  margin: 5px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-#shop {
-  display: none;
-  background: #333;
-  padding: 10px;
-  width: 300px;
-  margin: 10px auto;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Panel Personal</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>🔥 Luis Mario 🔥</h1>
+<div class="box">
 
-<div id="info">
-Nivel: <span id="nivel">1</span> |
-Monedas: <span id="monedas">0</span> |
-Skin: <span id="skin">Normal</span>
+  <h1>Panel Personal</h1>
+
+  <p id="date"></p>
+  <p id="clock"></p>
+
+  <h2 id="quote">Disciplina primero.</h2>
+
+  <div class="timer" id="timer">25:00</div>
+
+  <button id="startBtn">Iniciar enfoque</button>
+  <button id="darkBtn">Modo oscuro</button>
+
 </div>
 
-<canvas id="game" width="420" height="220"></canvas>
-
-<br>
-<button onclick="saltar()">⬆ Saltar</button>
-<button onclick="toggleShop()">🛒 Tienda</button>
-<button onclick="reiniciar()">🔄 Reiniciar</button>
-
-<div id="shop">
-  <h3>Tienda</h3>
-  <button onclick="comprarSkin('Rojo', 100)">Skin Roja (100)</button><br><br>
-  <button onclick="comprarSkin('Dorado', 500)">Skin Dorada (500)</button><br><br>
-  <button onclick="comprarPase()">🎟 Pase Legendario (5000)</button>
-</div>
-
-<script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-
-let jugador, obstaculo, monedas = 0;
-let nivel = 1;
-let velocidad = 2.5;
-let gravedad = 0.5;
-let pase = false;
-let skin = "Normal";
-let gameOver = false;
-
-function iniciar() {
-  jugador = { x: 40, y: 160, w: 20, h: 20, vy: 0 };
-  obstaculo = nuevoObstaculo();
-  gameOver = false;
-  loop();
-}
-
-function nuevoObstaculo() {
-  const tamaños = [20, 30, 40];
-  let size = tamaños[Math.floor(Math.random()*3)];
-  return { x: canvas.width, y: 180 - size, w: size, h: size };
-}
-
-function loop() {
-  if (gameOver) return;
-
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  // Jugador
-  jugador.vy += gravedad;
-  jugador.y += jugador.vy;
-  if (jugador.y > 160) {
-    jugador.y = 160;
-    jugador.vy = 0;
-  }
-
-  ctx.fillStyle = skin === "Dorado" ? "gold" : skin === "Rojo" ? "red" : "white";
-  ctx.fillRect(jugador.x, jugador.y, jugador.w, jugador.h);
-
-  // Obstáculo
-  obstaculo.x -= velocidad;
-  ctx.fillStyle = "#0af";
-  ctx.fillRect(obstaculo.x, obstaculo.y, obstaculo.w, obstaculo.h);
-
-  // Colisión
-  if (
-    jugador.x < obstaculo.x + obstaculo.w &&
-    jugador.x + jugador.w > obstaculo.x &&
-    jugador.y < obstaculo.y + obstaculo.h &&
-    jugador.y + jugador.h > obstaculo.y
-  ) {
-    gameOver = true;
-    alert("💀 Game Over");
-    return;
-  }
-
-  // Pasó obstáculo
-  if (obstaculo.x + obstaculo.w < 0) {
-    obstaculo = nuevoObstaculo();
-    monedas += pase ? 10 : 5;
-    nivel++;
-
-    if (nivel <= 1000) velocidad += 0.01;
-    else velocidad += 0.02;
-
-    if (nivel === 1000) {
-      monedas += 5000000;
-      alert("🎉 FELICITACIONES 🎉\nCompletaste 1000 niveles\n+5,000,000 monedas");
-    }
-  }
-
-  document.getElementById("nivel").textContent = nivel + " / 7000";
-  document.getElementById("monedas").textContent = monedas;
-  document.getElementById("skin").textContent = skin;
-
-  requestAnimationFrame(loop);
-}
-
-function saltar() {
-  if (jugador.y >= 160) jugador.vy = -9;
-}
-
-function reiniciar() {
-  nivel = 1;
-  velocidad = 2.5;
-  monedas = 0;
-  pase = false;
-  skin = "Normal";
-  iniciar();
-}
-
-function toggleShop() {
-  const s = document.getElementById("shop");
-  s.style.display = s.style.display === "none" ? "block" : "none";
-}
-
-function comprarSkin(nombre, precio) {
-  if (monedas >= precio) {
-    monedas -= precio;
-    skin = nombre;
-  } else alert("❌ No tienes monedas");
-}
-
-function comprarPase() {
-  if (monedas >= 5000) {
-    monedas -= 5000;
-    pase = true;
-    alert("🎟 Pase Legendario activado");
-  } else alert("❌ Necesitas 5000 monedas");
-}
-
-iniciar();
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
